@@ -50,7 +50,11 @@ int main(int argc, char *argv[]) {
   StructType *bar = StructType::create(getGlobalContext(), "Bar");
   bar->setBody({Builder.getInt8Ty(), Builder.getInt32Ty(), Builder.getInt8PtrTy()});
   ConstantPointerNull *bar_null = ConstantPointerNull::get(PointerType::get(bar, 0));
-  Value *next = Builder.CreateGEP(bar_null, {Builder.getInt32(0), Builder.getInt32(1)});
+  Value *next = Builder.CreateGEP(bar_null, {Builder.getInt32(1)});
+  Builder.CreateAdd(next, Builder.getInt32(3));
+  Value *ptr_int = Builder.CreatePtrToInt(next, Builder.getInt32Ty());
+
+  Builder.CreateStore(ptr_int, next);
 
   ModuleOb->print(errs(), nullptr);
   return 0;
