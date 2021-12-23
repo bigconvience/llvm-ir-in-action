@@ -1,0 +1,36 @@
+[LinkageTypes](https://llvm.org/doxygen/classllvm_1_1GlobalValue.html#aedfa75f0c85c4aa85b257f066fbea57c)
+[Type](https://llvm.org/doxygen/classllvm_1_1Type.html)
+[GlobalValue](https://llvm.org/doxygen/classllvm_1_1GlobalValue.html)
+[IRBuilder](https://llvm.org/doxygen/IRBuilder_8h_source.html)
+
+To compile the program on linux, run the following command
+
+$ clang++ module.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
+
+$ clang++ Global.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
+
+$ clang++ function.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
+
+$ clang++ funcArg.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
+
+$ clang++ functionBlock.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
+
+$ clang++ return.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
+
+$ clang++ arith.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
+
+$ clang++ ifelse.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
+
+$ clang++ loop.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
+
+$ clang++ arith.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -fno-rtti -o toy
+$ ./toy
