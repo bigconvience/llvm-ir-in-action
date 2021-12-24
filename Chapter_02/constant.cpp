@@ -3,6 +3,7 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Verifier.h"
 #include <vector>
+#include <iostream>
 using namespace llvm;
 
 static LLVMContext TheContext;
@@ -52,12 +53,20 @@ int main(int argc, char *argv[]) {
   ConstantPointerNull *bar_null = ConstantPointerNull::get(PointerType::get(bar, 0));
   Value *next = Builder.CreateGEP(bar_null, {Builder.getInt32(1)}, "next");
   Value *ptr_int = Builder.CreatePtrToInt(next, Builder.getInt32Ty(), "struct_size");
-  ConstantInt *CI = dyn_cast<ConstantInt>(ptr_int);
+  ptr_int->dump();
+  ptr_int->getType()->dump();
 
+  Value *cnt = Builder.getInt32(9);
   
-  Value *load = Builder.CreateLoad(Builder.getInt32Ty(), gVar);
-  
-  Value *ret = Builder.CreateAdd(load, CI, "retsult");
+  Value *load = Builder.CreateLoad(Builder.getInt32Ty(), gVar, "var");
+   
+  Value *stack = Builder.CreateAlloca(Builder.getInt32Ty(), nullptr, "stack");
+  Builder.CreateStore(ptr_int, stack);
+
+  Value *length = Builder.CreateAdd(load, Builder.CreateLoad(Builder.getInt32Ty(), stack), "retsult");
+
+  Builder.CreateGlobalString(StringRef("Hello, world!"), "hello");
+  Value *ret = Builder.CreateAdd(cnt, length);
   Builder.CreateRet(ret);
   ModuleOb->print(errs(), nullptr);
   return 0;
