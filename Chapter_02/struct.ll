@@ -3,17 +3,49 @@ source_filename = "struct.c"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
-%struct.Foo = type { i32, double }
+%struct.Point = type { double, double, double }
 
-@__const.main.a = private unnamed_addr constant %struct.Foo { i32 1, double 2.000000e+00 }, align 8
+@__const.main.a = private unnamed_addr constant %struct.Point { double 1.000000e+00, double 3.000000e+00, double 4.000000e+00 }, align 8
+@__const.main.b = private unnamed_addr constant %struct.Point { double 2.000000e+00, double 8.000000e+00, double 5.000000e+00 }, align 8
+
+; Function Attrs: noinline nounwind optnone uwtable
+define dso_local void @add_points(%struct.Point* noalias sret(%struct.Point) align 8 %0, %struct.Point* byval(%struct.Point) align 8 %1, %struct.Point* byval(%struct.Point) align 8 %2) #0 {
+  %4 = getelementptr inbounds %struct.Point, %struct.Point* %1, i32 0, i32 0
+  %5 = load double, double* %4, align 8
+  %6 = getelementptr inbounds %struct.Point, %struct.Point* %2, i32 0, i32 0
+  %7 = load double, double* %6, align 8
+  %8 = fadd double %5, %7
+  %9 = getelementptr inbounds %struct.Point, %struct.Point* %0, i32 0, i32 0
+  store double %8, double* %9, align 8
+  %10 = getelementptr inbounds %struct.Point, %struct.Point* %1, i32 0, i32 1
+  %11 = load double, double* %10, align 8
+  %12 = getelementptr inbounds %struct.Point, %struct.Point* %2, i32 0, i32 1
+  %13 = load double, double* %12, align 8
+  %14 = fadd double %11, %13
+  %15 = getelementptr inbounds %struct.Point, %struct.Point* %0, i32 0, i32 1
+  store double %14, double* %15, align 8
+  %16 = getelementptr inbounds %struct.Point, %struct.Point* %1, i32 0, i32 2
+  %17 = load double, double* %16, align 8
+  %18 = getelementptr inbounds %struct.Point, %struct.Point* %2, i32 0, i32 2
+  %19 = load double, double* %18, align 8
+  %20 = fadd double %17, %19
+  %21 = getelementptr inbounds %struct.Point, %struct.Point* %0, i32 0, i32 2
+  store double %20, double* %21, align 8
+  ret void
+}
 
 ; Function Attrs: noinline nounwind optnone uwtable
 define dso_local i32 @main() #0 {
   %1 = alloca i32, align 4
-  %2 = alloca %struct.Foo, align 8
+  %2 = alloca %struct.Point, align 8
+  %3 = alloca %struct.Point, align 8
+  %4 = alloca %struct.Point, align 8
   store i32 0, i32* %1, align 4
-  %3 = bitcast %struct.Foo* %2 to i8*
-  call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 8 %3, i8* align 8 bitcast (%struct.Foo* @__const.main.a to i8*), i64 16, i1 false)
+  %5 = bitcast %struct.Point* %2 to i8*
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 8 %5, i8* align 8 bitcast (%struct.Point* @__const.main.a to i8*), i64 24, i1 false)
+  %6 = bitcast %struct.Point* %3 to i8*
+  call void @llvm.memcpy.p0i8.p0i8.i64(i8* align 8 %6, i8* align 8 bitcast (%struct.Point* @__const.main.b to i8*), i64 24, i1 false)
+  call void @add_points(%struct.Point* sret(%struct.Point) align 8 %4, %struct.Point* byval(%struct.Point) align 8 %2, %struct.Point* byval(%struct.Point) align 8 %3)
   ret i32 0
 }
 
