@@ -40,7 +40,12 @@ int main(int argc, char *argv[]) {
 
   BasicBlock *entry = BasicBlock::Create(*TheContext, "entry", fooFunc);
   Builder->SetInsertPoint(entry);
-  Builder->CreateRet(Builder->getInt32(10));
+  Function::arg_iterator AI = fooFunc->arg_begin();
+  Value *Arg1 = AI++;
+  Value *Arg2 = AI;
+  Value *c = Builder->CreateAdd(Arg1, Arg2, "c");
+  Value *result = Builder->CreateAdd(c, Builder->getInt32(10), "result");
+  Builder->CreateRet(result);
   verifyFunction(*fooFunc);
 
   TheModule->print(errs(), nullptr);
