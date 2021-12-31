@@ -2,77 +2,67 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Verifier.h"
-#include <vector>
+
 using namespace llvm;
 
-static LLVMContext TheContext;
-static LLVMContext& getGlobalContext() {
-    return TheContext;
-}
-static LLVMContext &Context = getGlobalContext();
-static Module *ModuleOb = new Module("my compiler", Context);
+static std::unique_ptr<LLVMContext> TheContext;
+static std::unique_ptr<Module> TheModule;
+static std::unique_ptr<IRBuilder<>> Builder;
 
-Function *createFunc(IRBuilder<> &Builder, ArrayRef<Type*> Params, std::string Name) {
-  FunctionType *funcType = llvm::FunctionType::get(Builder.getInt32Ty(), Params, false);
-  Function *fooFunc = llvm::Function::Create(
-      funcType, llvm::Function::ExternalLinkage, Name, ModuleOb);
+static void InitializeModule() {
+  TheContext = std::make_unique<LLVMContext>();
+  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  // Create a new builder for the module.
+  Builder = std::make_unique<IRBuilder<>>(*TheContext);
+}
+
+Function *createFunc(Type *RetTy, ArrayRef<Type *> Params, std::string Name, bool isVarArg = false) {
+  FunctionType *funcType = FunctionType::get(RetTy, Params, isVarArg);
+  Function *fooFunc = Function::Create(funcType, Function::ExternalLinkage, Name, TheModule.get());
   return fooFunc;
 }
 
-BasicBlock *createBB(Function *fooFunc, std::string Name) {
-  return BasicBlock::Create(Context, Name, fooFunc);
+void setFuncArgs(Function *Func, std::vector<std::string> FuncArgs) {
+  unsigned Idx = 0;
+  Function::arg_iterator AI, AE;
+  for(AI = Func->arg_begin(), AE = Func->arg_end(); AI != AE; ++AI, ++Idx) {
+      AI->setName(FuncArgs[Idx]);
+    }
 }
 
-GlobalVariable *createGlob(IRBuilder<> &Builder, std::string Name) {
-    ModuleOb->getOrInsertGlobal(Name, Builder.getInt32Ty());
-    GlobalVariable *gVar = ModuleOb->getNamedGlobal(Name);
-    gVar->setLinkage(GlobalValue::CommonLinkage);
-    gVar->setAlignment(MaybeAlign(4));
+GlobalVariable *createGlob(Type *type, std::string name) {
+    TheModule->getOrInsertGlobal(name, type);
+    GlobalVariable *gVar = TheModule->getNamedGlobal(name);
     return gVar;
 }
 
 int main(int argc, char *argv[]) {
-  static IRBuilder<> Builder(Context);
-  GlobalVariable *gVar = createGlob(Builder, "variable");
-  gVar->setInitializer(Builder.getInt32(21));
-  StructType *opaque = StructType::create(getGlobalContext(), "opaque");
-  Function *barFunc = createFunc(Builder, {opaque}, "bar");
-  Function *fooFunc = createFunc(Builder, {}, "foo");
-  BasicBlock *entry = createBB(fooFunc, "entry");
-  Builder.SetInsertPoint(entry);
-  Value *load = Builder.CreateLoad(Type::getInt32Ty(getGlobalContext()), gVar);
-  Value *reg = Builder.CreateAdd(load, Builder.getInt32(2), "reg");
+  InitializeModule();
+  StructType *Foo = StructType::create(*TheContext, "Foo");
+  Foo->setBody({Builder->getInt32Ty(), Builder->getInt8PtrTy(), Builder->getDoubleTy()});
 
-  Type *x = Builder.getInt64Ty();
-  Type *y = Builder.getDoubleTy();
-  StructType *Foo = StructType::create(getGlobalContext(), "Foo");
-  Foo->setBody({x, y});
-  Value *stack = Builder.CreateAlloca(Foo, nullptr, "stack");
+  GlobalVariable *gVar = createGlob(Foo, "foo_struct");
 
-  StructType *FooBar = StructType::create(getGlobalContext(), "FooBar");
-  FooBar->setBody({ Foo, Builder.getInt8PtrTy(), PointerType::get(FooBar, 0)});
-  Value *fooBar = Builder.CreateAlloca(FooBar, nullptr, "fooBar");
+  Function *fooFunc = createFunc(PointerType::get(Foo, 0), {Builder->getInt32Ty()}, "Bar");
+  std::vector<std::string> FuncArgs;
+  FuncArgs.push_back("a");
+  setFuncArgs(fooFunc, FuncArgs);
 
-  Value *op = Builder.CreateAlloca(opaque, nullptr, "op");
-  
-  StructType *Bar = StructType::create(getGlobalContext(), "Bar");
-  Bar->setBody({Builder.getInt32Ty(), Builder.getInt8PtrTy(), Builder.getDoubleTy()});
-  Value *bar = Builder.CreateAlloca(Bar, nullptr, "bar");
-  Value *gep = Builder.CreateGEP(bar, {Builder.getInt32(0), Builder.getInt32(1)});
-  
-  Value *baz = Builder.CreateAlloca(Bar, Builder.getInt32(100), "baz");
-  Value *qux = Builder.CreateGEP(baz, {Builder.getInt32(17), Builder.getInt32(2)});
-  Builder.CreateStore(ConstantFP::get(Builder.getDoubleTy(), 0.0), qux);
+  BasicBlock *entry = BasicBlock::Create(*TheContext, "entry", fooFunc);
+  Builder->SetInsertPoint(entry);
+  Function::arg_iterator AI = fooFunc->arg_begin();
+  Value *Arg1 = AI++;
+  Value *result = Builder->CreateAdd(Arg1, Builder->getInt32(10), "result");
 
-  ArrayType *arrayType = ArrayType::get(Bar, 100);
-  Value *foos = Builder.CreateAlloca(arrayType, nullptr, "foos");
-  Value *foo_17 = Builder.CreateGEP(foos, 
-      {Builder.getInt32(0), Builder.getInt32(17), Builder.getInt32(2)});
-  Builder.CreateStore(ConstantFP::get(Builder.getDoubleTy(), 0.0), foo_17);
+  Value *fooBar = Builder->CreateAlloca(Foo, nullptr, "fooBar");
+  Value *b = Builder->CreateGEP(Foo, fooBar, {Builder->getInt32(0), Builder->getInt32(1)}, "b");
 
-  Builder.CreateRet(Builder.getInt32(0));
-  
+  Value *c = Builder->CreateGEP(Foo, fooBar, {Builder->getInt32(0), Builder->getInt32(2)}, "c");
+  Builder->CreateStore(ConstantFP::get(Builder->getDoubleTy(), 3.14), c);
+
+  Builder->CreateRet(fooBar);
   verifyFunction(*fooFunc);
-  ModuleOb->print(errs(), nullptr);
+
+  TheModule->print(errs(), nullptr);
   return 0;
 }
