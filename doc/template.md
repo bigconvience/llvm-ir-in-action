@@ -1,5 +1,3 @@
-# Title
-
 Description
 ## T1
 以Foo函数的声明为例：
@@ -35,6 +33,6 @@ declare i32 @Foo(i32)
 
 ### 源码地址
 
-[LLVM IR in Action/Chapter_02/](https://github.com/bigconvience/llvm-ir-in-action/blob/main/Chapter_02/function_create.cpp)
+[LLVM IR in Action/Chapter_03/](https://github.com/bigconvience/llvm-ir-in-action/blob/main/Chapter_03/ifelse.cpp)
 
 

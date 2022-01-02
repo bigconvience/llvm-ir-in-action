@@ -1,4 +1,4 @@
-﻿# LLVM IR in Action:Struct
+﻿# LLVM IR in Action:Structure
 
 标签（空格分隔）： LLVM IR Struct
 
