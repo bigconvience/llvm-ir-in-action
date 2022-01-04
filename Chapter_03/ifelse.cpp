@@ -1,6 +1,7 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/IRBuilder.h"
+#include "llvm/Support/raw_ostream.h"
 
 using namespace llvm;
 
@@ -48,18 +49,18 @@ void createMax() {
   Value *Arg1 = AI++;
   Value *Arg2 = AI;
 
-  // entry
   BasicBlock *entry = createBB(fooFunc, "entry");
+  BasicBlock *ThenBB = createBB(fooFunc, "then");
+  BasicBlock *ElseBB = createBB(fooFunc, "else");
+  BasicBlock *MergeBB = createBB(fooFunc, "ifcont");
+
+  // entry
   Builder->SetInsertPoint(entry);
   Value *retVal = Builder->CreateAlloca(Builder->getInt32Ty(), nullptr, "retVal");
 
   // if condition
   Value *Compare = Builder->CreateICmpULT(Arg1, Arg2, "cmptmp");
   Value *Cond = Builder->CreateICmpNE(Compare, Builder->getInt1(false), "ifcond");
-
-  BasicBlock *ThenBB = createBB(fooFunc, "then");
-  BasicBlock *ElseBB = createBB(fooFunc, "else");
-  BasicBlock *MergeBB = createBB(fooFunc, "ifcont");
   Builder->CreateCondBr(Cond, ThenBB, ElseBB);
 
   // Then 
@@ -84,7 +85,7 @@ int main(int argc, char *argv[]) {
 
   createMax();
 
-  TheModule->print(errs(), nullptr);
+  TheModule->print(outs(), nullptr);
   return 0;
 }
 

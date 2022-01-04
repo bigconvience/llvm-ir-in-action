@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
   ConstantPointerNull *bar_null = ConstantPointerNull::get(PointerType::get(bar, 0));
   Value *next = Builder.CreateGEP(bar_null, {Builder.getInt32(1)}, "next");
   Value *ptr_int = Builder.CreatePtrToInt(next, Builder.getInt32Ty(), "struct_size");
+
   ptr_int->dump();
   ptr_int->getType()->dump();
 
