@@ -1,112 +1,80 @@
-#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
-#include "llvm/IR/Verifier.h"
-#include <vector>
+#include "llvm/IR/IRBuilder.h"
+
 using namespace llvm;
 
-static LLVMContext TheContext;
-static LLVMContext& getGlobalContext() {
-    return TheContext;
-}
-static LLVMContext &Context = getGlobalContext();
-static Module *ModuleOb = new Module("my compiler", Context);
-static std::vector<std::string> FunArgs;
-typedef SmallVector<BasicBlock *, 16> BBList;
-typedef SmallVector<Value *, 16> ValList;
+static std::unique_ptr<LLVMContext> TheContext;
+static std::unique_ptr<Module> TheModule;
+static std::unique_ptr<IRBuilder<>> Builder;
 
-Function *createFunc(IRBuilder<> &Builder, std::string Name) {
-  std::vector<Type *> Integers(FunArgs.size(), Type::getInt32Ty(Context));
-  FunctionType *funcType = llvm::FunctionType::get(Builder.getInt32Ty(), Integers, false);
-  Function *fooFunc = llvm::Function::Create(
-      funcType, llvm::Function::ExternalLinkage, Name, ModuleOb);
+static void InitializeModule() {
+  TheContext = std::make_unique<LLVMContext>();
+  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  Builder = std::make_unique<IRBuilder<>>(*TheContext);
+}
+
+Function *createFunc(Type *RetTy, ArrayRef<Type *> Params, std::string Name, bool isVarArg = false) {
+  FunctionType *funcType = FunctionType::get(RetTy, Params, isVarArg);
+  Function *fooFunc = Function::Create(funcType, Function::ExternalLinkage, Name, TheModule.get());
   return fooFunc;
 }
 
-void setFuncArgs(Function *fooFunc, std::vector<std::string> FunArgs) {
-    unsigned Idx = 0;
-    Function::arg_iterator AI, AE;
-    for (AI = fooFunc->arg_begin(), AE = fooFunc->arg_end(); AI != AE;
-         ++AI, ++Idx)
-        AI->setName(FunArgs[Idx]);
+void setFuncArgs(Function *Func, std::vector<std::string> FuncArgs) {
+  unsigned Idx = 0;
+  Function::arg_iterator AI, AE;
+  for(AI = Func->arg_begin(), AE = Func->arg_end(); AI != AE; ++AI, ++Idx) {
+      AI->setName(FuncArgs[Idx]);
+    }
 }
 
 BasicBlock *createBB(Function *fooFunc, std::string Name) {
-  return BasicBlock::Create(Context, Name, fooFunc);
+  return BasicBlock::Create(*TheContext, Name, fooFunc);
 }
 
-GlobalVariable *createGlob(IRBuilder<> &Builder, std::string Name) {
-    ModuleOb->getOrInsertGlobal(Name, Builder.getInt32Ty());
-    GlobalVariable *gVar = ModuleOb->getNamedGlobal(Name);
-    gVar->setLinkage(GlobalValue::CommonLinkage);
-    gVar->setAlignment(MaybeAlign(4));
-    return gVar;
-}
-
-Value *createArith(IRBuilder<> &Builder, Value *L, Value *R) {
-  return Builder.CreateMul(L, R, "multmp");
-}
-
-Value *createIfElse(IRBuilder<> &Builder, BBList List, ValList VL) {
-  Value *Condtn = VL[0];
-  Value *Arg1 = VL[1];
-  BasicBlock *ThenBB = List[0];
-  BasicBlock *ElseBB = List[1];
-  BasicBlock *MergeBB = List[2];
-  Builder.CreateCondBr(Condtn, ThenBB, ElseBB);
-
-  Builder.SetInsertPoint(ThenBB);
-  Value *ThenVal = Builder.CreateAdd(Arg1, Builder.getInt32(1), "thenaddtmp");
-  Builder.CreateBr(MergeBB);
-
-  Builder.SetInsertPoint(ElseBB);
-  Value *ElseVal = Builder.CreateAdd(Arg1, Builder.getInt32(2), "elseaddtmp");
-  Builder.CreateBr(MergeBB);
-
-  unsigned PhiBBSize = List.size() - 1;
-  Builder.SetInsertPoint(MergeBB);
-  PHINode *Phi = Builder.CreatePHI(Type::getInt32Ty(getGlobalContext()),
-                                   PhiBBSize, "iftmp");
-  Phi->addIncoming(ThenVal, ThenBB);
-  Phi->addIncoming(ElseVal, ElseBB);
-
-  return Phi;
-}
 
 int main(int argc, char *argv[]) {
-  FunArgs.push_back("a");
-  FunArgs.push_back("b");
-  static IRBuilder<> Builder(Context);
-  GlobalVariable *gVar = createGlob(Builder, "x");
-  Function *fooFunc = createFunc(Builder, "foo");
-  setFuncArgs(fooFunc, FunArgs);
-  BasicBlock *entry = createBB(fooFunc, "entry");
-  Builder.SetInsertPoint(entry);
-  Value *Arg1 = fooFunc->arg_begin();
-  Value *constant = Builder.getInt32(16);
-  Value *val = createArith(Builder, Arg1, constant);
-    
-  Value *val2 = Builder.getInt32(100);
-  Value *Compare = Builder.CreateICmpULT(val, val2, "cmptmp");
-  Value *Condtn = Builder.CreateICmpNE(Compare, Builder.getInt1(false), "ifcond");
+  InitializeModule();
 
-  ValList VL;
-  VL.push_back(Condtn);
-  VL.push_back(Arg1);
+  Function *fooFunc = createFunc(Builder->getInt32Ty(), {Builder->getInt32Ty(), Builder->getInt32Ty()}, "max");
+  std::vector<std::string> FuncArgs;
+  FuncArgs.push_back("a");
+  FuncArgs.push_back("b");
+  setFuncArgs(fooFunc, FuncArgs);
+
+  BasicBlock *entry = createBB(fooFunc, "entry");
+  Builder->SetInsertPoint(entry);
+  Value *retVal = Builder->CreateAlloca(Builder->getInt32Ty(), nullptr, "retVal");
+  
+  Function::arg_iterator AI = fooFunc->arg_begin();
+  Value *Arg1 = AI++;
+  Value *Arg2 = AI;
+
+  // if condition
+  Value *Compare = Builder->CreateICmpULT(Arg1, Arg2, "cmptmp");
+  Value *Cond = Builder->CreateICmpNE(Compare, Builder->getInt1(false), "ifcond");
 
   BasicBlock *ThenBB = createBB(fooFunc, "then");
   BasicBlock *ElseBB = createBB(fooFunc, "else");
   BasicBlock *MergeBB = createBB(fooFunc, "ifcont");
-  BBList List;
-  List.push_back(ThenBB);
-  List.push_back(ElseBB);
-  List.push_back(MergeBB);
+  Builder->CreateCondBr(Cond, ThenBB, ElseBB);
 
-  Value *v = createIfElse(Builder, List, VL);
+  // Then 
+  Builder->SetInsertPoint(ThenBB);
+  Builder->CreateStore(Arg1, retVal);
+  Builder->CreateBr(MergeBB);
 
-  Builder.CreateRet(v);
+  // else
+  Builder->SetInsertPoint(ElseBB);
+  Builder->CreateStore(Arg2, retVal);
+  Builder->CreateBr(MergeBB);
 
-  verifyFunction(*fooFunc);
-  ModuleOb->print(errs(), nullptr);
+  // end
+  Builder->SetInsertPoint(MergeBB);
+  Value *maxVal = Builder->CreateLoad(Builder->getInt32Ty(), retVal);
+  Builder->CreateRet(maxVal);
+
+  TheModule->print(errs(), nullptr);
   return 0;
 }
+
