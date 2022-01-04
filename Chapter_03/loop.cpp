@@ -1,104 +1,91 @@
-#include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
-#include "llvm/IR/Verifier.h"
-#include <vector>
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/Support/raw_ostream.h"
+
 using namespace llvm;
 
-static LLVMContext TheContext;
-static LLVMContext& getGlobalContext() {
-    return TheContext;
-}
-static LLVMContext &Context = getGlobalContext();
-static Module *ModuleOb = new Module("my compiler", Context);
-static std::vector<std::string> FunArgs;
-typedef SmallVector<BasicBlock *, 16> BBList;
-typedef SmallVector<Value *, 16> ValList;
+static std::unique_ptr<LLVMContext> TheContext;
+static std::unique_ptr<Module> TheModule;
+static std::unique_ptr<IRBuilder<>> Builder;
 
-Function *createFunc(IRBuilder<> &Builder, std::string Name) {
-  std::vector<Type *> Integers(FunArgs.size(), Type::getInt32Ty(Context));
-  FunctionType *funcType = llvm::FunctionType::get(Builder.getInt32Ty(), Integers, false);
-  Function *fooFunc = llvm::Function::Create(
-      funcType, llvm::Function::ExternalLinkage, Name, ModuleOb);
+static void InitializeModule() {
+  TheContext = std::make_unique<LLVMContext>();
+  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  Builder = std::make_unique<IRBuilder<>>(*TheContext);
+}
+
+Function *createFunc(Type *RetTy, ArrayRef<Type *> Params, std::string Name, bool isVarArg = false) {
+  FunctionType *funcType = FunctionType::get(RetTy, Params, isVarArg);
+  Function *fooFunc = Function::Create(funcType, Function::ExternalLinkage, Name, TheModule.get());
   return fooFunc;
 }
 
-void setFuncArgs(Function *fooFunc, std::vector<std::string> FunArgs) {
-    unsigned Idx = 0;
-    Function::arg_iterator AI, AE;
-    for (AI = fooFunc->arg_begin(), AE = fooFunc->arg_end(); AI != AE;
-         ++AI, ++Idx)
-        AI->setName(FunArgs[Idx]);
+void setFuncArgs(Function *Func, std::vector<std::string> FuncArgs) {
+  unsigned Idx = 0;
+  Function::arg_iterator AI, AE;
+  for(AI = Func->arg_begin(), AE = Func->arg_end(); AI != AE; ++AI, ++Idx) {
+      AI->setName(FuncArgs[Idx]);
+    }
 }
 
 BasicBlock *createBB(Function *fooFunc, std::string Name) {
-  return BasicBlock::Create(Context, Name, fooFunc);
+  return BasicBlock::Create(*TheContext, Name, fooFunc);
 }
 
-GlobalVariable *createGlob(IRBuilder<> &Builder, std::string Name) {
-    ModuleOb->getOrInsertGlobal(Name, Builder.getInt32Ty());
-    GlobalVariable *gVar = ModuleOb->getNamedGlobal(Name);
-    gVar->setLinkage(GlobalValue::CommonLinkage);
-    gVar->setAlignment(MaybeAlign(4));
-    return gVar;
+Function *createMaxProto(std::string funcName) {
+  Function *fooFunc = createFunc(Builder->getInt32Ty(), {Builder->getInt32Ty(), Builder->getInt32Ty()}, funcName);
+  std::vector<std::string> FuncArgs;
+  FuncArgs.push_back("a");
+  FuncArgs.push_back("b");
+  setFuncArgs(fooFunc, FuncArgs);
+  return fooFunc;
 }
 
-Value *createArith(IRBuilder<> &Builder, Value *L, Value *R) {
-  return Builder.CreateMul(L, R, "multmp");
-}
-
-Value *createLoop(IRBuilder<> &Builder, BBList List, ValList VL,
-                    Value *StartVal, Value *EndVal) {
-  BasicBlock *PreheaderBB = Builder.GetInsertBlock();
-  Value *val = VL[0];
-  BasicBlock *LoopBB = List[0];
-  Builder.CreateBr(LoopBB);
-  Builder.SetInsertPoint(LoopBB);
-  PHINode *IndVar = Builder.CreatePHI(Type::getInt32Ty(Context), 2, "i");
-  IndVar->addIncoming(StartVal, PreheaderBB);
-  Value *Add = Builder.CreateAdd(val, Builder.getInt32(5), "addtmp");
-  Value *StepVal = Builder.getInt32(1);
-  Value *NextVal = Builder.CreateAdd(IndVar, StepVal, "nextval");
-  Value *EndCond = Builder.CreateICmpULT(IndVar, EndVal, "endcond");
-  EndCond = Builder.CreateICmpNE(EndCond, Builder.getInt1(false), "loopcond");
-  BasicBlock *LoopEndBB = Builder.GetInsertBlock();
-  BasicBlock *AfterBB = List[1];
-  Builder.CreateCondBr(EndCond, LoopBB, AfterBB);
-  Builder.SetInsertPoint(AfterBB);
-  IndVar->addIncoming(NextVal, LoopEndBB);
-  return Add;
-}
-
-int main(int argc, char *argv[]) {
-  FunArgs.push_back("a");
-  FunArgs.push_back("b");
-  static IRBuilder<> Builder(Context);
-  GlobalVariable *gVar = createGlob(Builder, "x");
-  Function *fooFunc = createFunc(Builder, "foo");
-  setFuncArgs(fooFunc, FunArgs);
-  BasicBlock *entry = createBB(fooFunc, "entry");
-  Builder.SetInsertPoint(entry);
+void createMax() {
+  Function *fooFunc = createMaxProto("max");
+  // args
   Function::arg_iterator AI = fooFunc->arg_begin();
   Value *Arg1 = AI++;
   Value *Arg2 = AI;
-  Value *constant = Builder.getInt32(16);
-  Value *val = createArith(Builder, Arg1, constant);
-    
-  ValList VL;
-  VL.push_back(Arg1);
 
-  BBList List;
+  BasicBlock *entry = createBB(fooFunc, "entry");
+  BasicBlock *ThenBB = createBB(fooFunc, "then");
+  BasicBlock *ElseBB = createBB(fooFunc, "else");
+  BasicBlock *MergeBB = createBB(fooFunc, "ifcont");
 
-  BasicBlock *LoopBB = createBB(fooFunc, "loop");
-  BasicBlock *AfterBB = createBB(fooFunc, "afterloop");
-  List.push_back(LoopBB);
-  List.push_back(AfterBB);
-  Value *StartVal = Builder.getInt32(1);
-  Value *Res = createLoop(Builder, List, VL, StartVal, Arg2);
+  // entry
+  Builder->SetInsertPoint(entry);
+  Value *retVal = Builder->CreateAlloca(Builder->getInt32Ty(), nullptr, "retVal");
 
-  Builder.CreateRet(Res);
+  // if condition
+  Value *Compare = Builder->CreateICmpULT(Arg1, Arg2, "cmptmp");
+  Value *Cond = Builder->CreateICmpNE(Compare, Builder->getInt1(false), "ifcond");
+  Builder->CreateCondBr(Cond, ThenBB, ElseBB);
 
-  verifyFunction(*fooFunc);
-  ModuleOb->print(errs(), nullptr);
+  // Then 
+  Builder->SetInsertPoint(ThenBB);
+  Builder->CreateStore(Arg1, retVal);
+  Builder->CreateBr(MergeBB);
+
+  // else
+  Builder->SetInsertPoint(ElseBB);
+  Builder->CreateStore(Arg2, retVal);
+  Builder->CreateBr(MergeBB);
+
+  // end
+  Builder->SetInsertPoint(MergeBB);
+  Value *maxVal = Builder->CreateLoad(Builder->getInt32Ty(), retVal);
+  Builder->CreateRet(maxVal);
+}
+
+
+int main(int argc, char *argv[]) {
+  InitializeModule();
+
+  createMax();
+
+  TheModule->print(outs(), nullptr);
   return 0;
 }
+
