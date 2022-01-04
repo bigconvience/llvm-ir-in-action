@@ -41,8 +41,10 @@ Function *createMaxProto(std::string funcName) {
   return fooFunc;
 }
 
-void createMax() {
-  Function *fooFunc = createMaxProto("max");
+
+void createMax_phi() {
+  Function *fooFunc = createMaxProto("max_phi");
+
   // args
   Function::arg_iterator AI = fooFunc->arg_begin();
   Value *Arg1 = AI++;
@@ -64,25 +66,28 @@ void createMax() {
 
   // Then 
   Builder->SetInsertPoint(ThenBB);
-  Builder->CreateStore(Arg1, retVal);
+  Value *ThenVal = Builder->CreateAdd(Arg1, Builder->getInt32(1), "thenVal");
   Builder->CreateBr(MergeBB);
 
   // else
   Builder->SetInsertPoint(ElseBB);
-  Builder->CreateStore(Arg2, retVal);
+  Value *ElseVal = Builder->CreateMul(Arg2, Builder->getInt32(16), "elseVal");
   Builder->CreateBr(MergeBB);
 
   // end
   Builder->SetInsertPoint(MergeBB);
-  Value *maxVal = Builder->CreateLoad(Builder->getInt32Ty(), retVal);
-  Builder->CreateRet(maxVal);
+  PHINode *Phi = Builder->CreatePHI(Builder->getInt32Ty(), 2, "iftmp");
+  Phi->addIncoming(ThenVal, ThenBB);
+  Phi->addIncoming(ElseVal, ElseBB);
+
+  Builder->CreateRet(Phi);
 }
 
 
 int main(int argc, char *argv[]) {
   InitializeModule();
 
-  createMax();
+  createMax_phi();
 
   TheModule->print(errs(), nullptr);
   return 0;
