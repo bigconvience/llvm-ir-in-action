@@ -44,7 +44,7 @@ Function *createMaxProto(std::string funcName) {
 
 
 void createMax_phi() {
-  Function *fooFunc = createMaxProto("max_phi");
+  Function *fooFunc = createMaxProto("max");
 
   // args
   Function::arg_iterator AI = fooFunc->arg_begin();
