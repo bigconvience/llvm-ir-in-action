@@ -42,48 +42,59 @@ Function *createMaxProto(std::string funcName) {
   return fooFunc;
 }
 
-void createMax() {
-  Function *fooFunc = createMaxProto("max");
+void createSum() {
+  Function *fooFunc = createMaxProto("sum");
+
   // args
   Function::arg_iterator AI = fooFunc->arg_begin();
-  Value *Arg1 = AI++;
-  Value *Arg2 = AI;
+  Value *StartVal = AI++;
+  Value *EndVal = AI;
 
-  BasicBlock *entry = createBB(fooFunc, "entry");
-  BasicBlock *ThenBB = createBB(fooFunc, "then");
-  BasicBlock *ElseBB = createBB(fooFunc, "else");
-  BasicBlock *MergeBB = createBB(fooFunc, "ifcont");
+  BasicBlock *entryBB = createBB(fooFunc, "entry");
+  BasicBlock *loopBB = createBB(fooFunc, "loop");
+  BasicBlock *endEntryBB = createBB(fooFunc, "endEntry");
+  BasicBlock *endLoopBB = createBB(fooFunc, "endLoop");
 
   // entry
-  Builder->SetInsertPoint(entry);
-  Value *retVal = Builder->CreateAlloca(Builder->getInt32Ty(), nullptr, "retVal");
+  Builder->SetInsertPoint(entryBB);
+  Value *initVal = Builder->CreateSub(StartVal, EndVal, "init");
+  Value *EndCond = Builder->CreateICmpULE(StartVal, EndVal, "entryEndCond");
+  EndCond = Builder->CreateICmpNE(EndCond, Builder->getInt1(false), "entryCond");
+  Builder->CreateCondBr(EndCond, loopBB, endEntryBB);
 
-  // if condition
-  Value *Compare = Builder->CreateICmpULT(Arg1, Arg2, "cmptmp");
-  Value *Cond = Builder->CreateICmpNE(Compare, Builder->getInt1(false), "ifcond");
-  Builder->CreateCondBr(Cond, ThenBB, ElseBB);
+  // loop 
+  Builder->SetInsertPoint(loopBB);
 
-  // Then 
-  Builder->SetInsertPoint(ThenBB);
-  Builder->CreateStore(Arg1, retVal);
-  Builder->CreateBr(MergeBB);
+  PHINode *iPhi = Builder->CreatePHI(Builder->getInt32Ty(), 2, "i");
+  iPhi->addIncoming(StartVal, entryBB);
+  PHINode *sumPhi = Builder->CreatePHI(Builder->getInt32Ty(), 2, "sum");
+  
+  sumPhi->addIncoming(initVal, loopBB);
+  Value *nextI = Builder->CreateAdd(iPhi, Builder->getInt32(1), "nextI");
+  Value *nextSum = Builder->CreateAdd(sumPhi, iPhi, "nextSum");
 
-  // else
-  Builder->SetInsertPoint(ElseBB);
-  Builder->CreateStore(Arg2, retVal);
-  Builder->CreateBr(MergeBB);
+  EndCond = Builder->CreateICmpULE(nextI, EndVal, "loopEndCond");
+  EndCond = Builder->CreateICmpNE(EndCond, Builder->getInt1(false), "loopCond");
+  Builder->CreateCondBr(EndCond, loopBB, endLoopBB);
 
-  // end
-  Builder->SetInsertPoint(MergeBB);
-  Value *maxVal = Builder->CreateLoad(Builder->getInt32Ty(), retVal);
-  Builder->CreateRet(maxVal);
+  
+  iPhi->addIncoming(nextI, loopBB);
+  sumPhi->addIncoming(nextSum, loopBB);
+
+  // endLoopBB
+  Builder->SetInsertPoint(endLoopBB);
+  Builder->CreateRet(sumPhi);
+
+  // endInit
+  Builder->SetInsertPoint(endEntryBB);
+  Builder->CreateRet(initVal);
 }
 
 
 int main(int argc, char *argv[]) {
   InitializeModule();
 
-  createMax();
+  createSum();
 
   TheModule->print(outs(), nullptr);
   return 0;
