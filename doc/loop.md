@@ -27,9 +27,9 @@ Function *createMaxProto(std::string funcName) {
   return fooFunc;
 }
 ```
-定义了函数max：
+定义了函数sum：
 ```
-declare i32 @max(i32 %a, i32 %b);
+declare i32 @sum(i32 %a, i32 %b);
 ```
 ### 设置函数参数
 创建并设置函数参数：
