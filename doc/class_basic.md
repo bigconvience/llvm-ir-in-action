@@ -206,7 +206,8 @@ entry:
 ```
 ## 总结
 ### Name Mangling
-[https://www.avabodh.com/cxxin/namemangling.html](https://www.avabodh.com/cxxin/namemangling.html)介绍了CPP的函数编译后的符号名称
+[https://www.avabodh.com/cxxin/namemangling.html](https://www.avabodh.com/cxxin/namemangling.html)和[The Secret Life of C++: Symbol Mangling](http://web.mit.edu/tibbetts/Public/inside-c/www/mangling.html#mangling-clang-s)介绍了CPP的函数编译后的符号名称
+
 ### 源码
 ```
 #include "llvm/IR/IRBuilder.h"
