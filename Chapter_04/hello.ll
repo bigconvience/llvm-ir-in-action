@@ -19,14 +19,46 @@ target triple = "x86_64-pc-linux-gnu"
 %struct.__locale_data = type opaque
 %"class.std::num_put" = type { %"class.std::locale::facet.base", [4 x i8] }
 %"class.std::num_get" = type { %"class.std::locale::facet.base", [4 x i8] }
-%class.Box = type { double, double, double }
+%class.Square = type { i32 (...)**, double }
+%class.Rectangle = type { %class.Square, double }
+
+$_ZN6SquareC2Ev = comdat any
+
+$_ZN6Square3setEd = comdat any
+
+$_ZN6Square7getAreaEv = comdat any
+
+$_ZN9RectangleC2Ev = comdat any
+
+$_ZN9Rectangle9setLengthEd = comdat any
+
+$_ZN9Rectangle7getAreaEv = comdat any
+
+$_ZTV6Square = comdat any
+
+$_ZTS6Square = comdat any
+
+$_ZTI6Square = comdat any
+
+$_ZTV9Rectangle = comdat any
+
+$_ZTS9Rectangle = comdat any
+
+$_ZTI9Rectangle = comdat any
 
 @_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
 @__dso_handle = external hidden global i8
 @_ZSt4cout = external dso_local global %"class.std::basic_ostream", align 8
-@.str = private unnamed_addr constant [18 x i8] c"Box1 \E7\9A\84\E4\BD\93\E7\A7\AF\EF\BC\9A\00", align 1
-@.str.1 = private unnamed_addr constant [18 x i8] c"Box2 \E7\9A\84\E4\BD\93\E7\A7\AF\EF\BC\9A\00", align 1
-@.str.2 = private unnamed_addr constant [18 x i8] c"Box3 \E7\9A\84\E4\BD\93\E7\A7\AF\EF\BC\9A\00", align 1
+@.str = private unnamed_addr constant [16 x i8] c"Square1 volumn \00", align 1
+@.str.1 = private unnamed_addr constant [10 x i8] c"rec area \00", align 1
+@_ZTV6Square = linkonce_odr dso_local unnamed_addr constant { [3 x i8*] } { [3 x i8*] [i8* null, i8* bitcast ({ i8*, i8* }* @_ZTI6Square to i8*), i8* bitcast (double (%class.Square*)* @_ZN6Square7getAreaEv to i8*)] }, comdat, align 8
+@_ZTVN10__cxxabiv117__class_type_infoE = external dso_local global i8*
+@_ZTS6Square = linkonce_odr dso_local constant [8 x i8] c"6Square\00", comdat, align 1
+@_ZTI6Square = linkonce_odr dso_local constant { i8*, i8* } { i8* bitcast (i8** getelementptr inbounds (i8*, i8** @_ZTVN10__cxxabiv117__class_type_infoE, i64 2) to i8*), i8* getelementptr inbounds ([8 x i8], [8 x i8]* @_ZTS6Square, i32 0, i32 0) }, comdat, align 8
+@_ZTV9Rectangle = linkonce_odr dso_local unnamed_addr constant { [3 x i8*] } { [3 x i8*] [i8* null, i8* bitcast ({ i8*, i8*, i8* }* @_ZTI9Rectangle to i8*), i8* bitcast (double (%class.Rectangle*)* @_ZN9Rectangle7getAreaEv to i8*)] }, comdat, align 8
+@_ZTVN10__cxxabiv120__si_class_type_infoE = external dso_local global i8*
+@_ZTS9Rectangle = linkonce_odr dso_local constant [11 x i8] c"9Rectangle\00", comdat, align 1
+@_ZTI9Rectangle = linkonce_odr dso_local constant { i8*, i8*, i8* } { i8* bitcast (i8** getelementptr inbounds (i8*, i8** @_ZTVN10__cxxabiv120__si_class_type_infoE, i64 2) to i8*), i8* getelementptr inbounds ([11 x i8], [11 x i8]* @_ZTS9Rectangle, i32 0, i32 0), i8* bitcast ({ i8*, i8* }* @_ZTI6Square to i8*) }, comdat, align 8
 @llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_hello.cpp, i8* null }]
 
 ; Function Attrs: noinline uwtable
@@ -44,100 +76,76 @@ declare dso_local void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"* no
 ; Function Attrs: nounwind
 declare dso_local i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
 
-; Function Attrs: mustprogress noinline nounwind optnone uwtable
-define dso_local double @_ZN3Box3getEv(%class.Box* nonnull align 8 dereferenceable(24) %0) #4 align 2 {
-  %2 = alloca %class.Box*, align 8
-  store %class.Box* %0, %class.Box** %2, align 8
-  %3 = load %class.Box*, %class.Box** %2, align 8
-  %4 = getelementptr inbounds %class.Box, %class.Box* %3, i32 0, i32 0
-  %5 = load double, double* %4, align 8
-  %6 = getelementptr inbounds %class.Box, %class.Box* %3, i32 0, i32 1
-  %7 = load double, double* %6, align 8
-  %8 = fmul double %5, %7
-  %9 = getelementptr inbounds %class.Box, %class.Box* %3, i32 0, i32 2
-  %10 = load double, double* %9, align 8
-  %11 = fmul double %8, %10
-  ret double %11
+; Function Attrs: mustprogress noinline norecurse optnone uwtable
+define dso_local i32 @main() #4 {
+  %1 = alloca i32, align 4
+  %2 = alloca %class.Square, align 8
+  %3 = alloca double, align 8
+  %4 = alloca %class.Rectangle, align 8
+  %5 = alloca %class.Rectangle*, align 8
+  %6 = alloca double, align 8
+  store i32 0, i32* %1, align 4
+  call void @_ZN6SquareC2Ev(%class.Square* nonnull align 8 dereferenceable(16) %2) #3
+  call void @_ZN6Square3setEd(%class.Square* nonnull align 8 dereferenceable(16) %2, double 5.000000e+00)
+  %7 = call double @_ZN6Square7getAreaEv(%class.Square* nonnull align 8 dereferenceable(16) %2)
+  store double %7, double* %3, align 8
+  %8 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) @_ZSt4cout, i8* getelementptr inbounds ([16 x i8], [16 x i8]* @.str, i64 0, i64 0))
+  %9 = load double, double* %3, align 8
+  %10 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEd(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %8, double %9)
+  %11 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %10, %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
+  call void @_ZN9RectangleC2Ev(%class.Rectangle* nonnull align 8 dereferenceable(24) %4) #3
+  %12 = bitcast %class.Rectangle* %4 to %class.Square*
+  call void @_ZN6Square3setEd(%class.Square* nonnull align 8 dereferenceable(16) %12, double 3.000000e+00)
+  call void @_ZN9Rectangle9setLengthEd(%class.Rectangle* nonnull align 8 dereferenceable(24) %4, double 4.000000e+00)
+  store %class.Rectangle* %4, %class.Rectangle** %5, align 8
+  %13 = load %class.Rectangle*, %class.Rectangle** %5, align 8
+  %14 = bitcast %class.Rectangle* %13 to double (%class.Rectangle*)***
+  %15 = load double (%class.Rectangle*)**, double (%class.Rectangle*)*** %14, align 8
+  %16 = getelementptr inbounds double (%class.Rectangle*)*, double (%class.Rectangle*)** %15, i64 0
+  %17 = load double (%class.Rectangle*)*, double (%class.Rectangle*)** %16, align 8
+  %18 = call double %17(%class.Rectangle* nonnull align 8 dereferenceable(24) %13)
+  store double %18, double* %6, align 8
+  %19 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) @_ZSt4cout, i8* getelementptr inbounds ([10 x i8], [10 x i8]* @.str.1, i64 0, i64 0))
+  %20 = load double, double* %6, align 8
+  %21 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEd(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %19, double %20)
+  %22 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %21, %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
+  ret i32 0
 }
 
-; Function Attrs: mustprogress noinline nounwind optnone uwtable
-define dso_local void @_ZN3Box3setEddd(%class.Box* nonnull align 8 dereferenceable(24) %0, double %1, double %2, double %3) #4 align 2 {
-  %5 = alloca %class.Box*, align 8
-  %6 = alloca double, align 8
-  %7 = alloca double, align 8
-  %8 = alloca double, align 8
-  store %class.Box* %0, %class.Box** %5, align 8
-  store double %1, double* %6, align 8
-  store double %2, double* %7, align 8
-  store double %3, double* %8, align 8
-  %9 = load %class.Box*, %class.Box** %5, align 8
-  %10 = load double, double* %6, align 8
-  %11 = getelementptr inbounds %class.Box, %class.Box* %9, i32 0, i32 0
-  store double %10, double* %11, align 8
-  %12 = load double, double* %7, align 8
-  %13 = getelementptr inbounds %class.Box, %class.Box* %9, i32 0, i32 1
-  store double %12, double* %13, align 8
-  %14 = load double, double* %8, align 8
-  %15 = getelementptr inbounds %class.Box, %class.Box* %9, i32 0, i32 2
-  store double %14, double* %15, align 8
+; Function Attrs: noinline nounwind optnone uwtable
+define linkonce_odr dso_local void @_ZN6SquareC2Ev(%class.Square* nonnull align 8 dereferenceable(16) %0) unnamed_addr #5 comdat align 2 {
+  %2 = alloca %class.Square*, align 8
+  store %class.Square* %0, %class.Square** %2, align 8
+  %3 = load %class.Square*, %class.Square** %2, align 8
+  %4 = bitcast %class.Square* %3 to i32 (...)***
+  store i32 (...)** bitcast (i8** getelementptr inbounds ({ [3 x i8*] }, { [3 x i8*] }* @_ZTV6Square, i32 0, inrange i32 0, i32 2) to i32 (...)**), i32 (...)*** %4, align 8
   ret void
 }
 
-; Function Attrs: mustprogress noinline norecurse optnone uwtable
-define dso_local i32 @main() #5 {
-  %1 = alloca i32, align 4
-  %2 = alloca %class.Box, align 8
-  %3 = alloca %class.Box, align 8
-  %4 = alloca %class.Box, align 8
-  %5 = alloca double, align 8
-  store i32 0, i32* %1, align 4
-  store double 0.000000e+00, double* %5, align 8
-  %6 = getelementptr inbounds %class.Box, %class.Box* %2, i32 0, i32 2
-  store double 5.000000e+00, double* %6, align 8
-  %7 = getelementptr inbounds %class.Box, %class.Box* %2, i32 0, i32 0
-  store double 6.000000e+00, double* %7, align 8
-  %8 = getelementptr inbounds %class.Box, %class.Box* %2, i32 0, i32 1
-  store double 7.000000e+00, double* %8, align 8
-  %9 = getelementptr inbounds %class.Box, %class.Box* %3, i32 0, i32 2
-  store double 1.000000e+01, double* %9, align 8
-  %10 = getelementptr inbounds %class.Box, %class.Box* %3, i32 0, i32 0
-  store double 1.200000e+01, double* %10, align 8
-  %11 = getelementptr inbounds %class.Box, %class.Box* %3, i32 0, i32 1
-  store double 1.300000e+01, double* %11, align 8
-  %12 = getelementptr inbounds %class.Box, %class.Box* %2, i32 0, i32 2
-  %13 = load double, double* %12, align 8
-  %14 = getelementptr inbounds %class.Box, %class.Box* %2, i32 0, i32 0
-  %15 = load double, double* %14, align 8
-  %16 = fmul double %13, %15
-  %17 = getelementptr inbounds %class.Box, %class.Box* %2, i32 0, i32 1
-  %18 = load double, double* %17, align 8
-  %19 = fmul double %16, %18
-  store double %19, double* %5, align 8
-  %20 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) @_ZSt4cout, i8* getelementptr inbounds ([18 x i8], [18 x i8]* @.str, i64 0, i64 0))
-  %21 = load double, double* %5, align 8
-  %22 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEd(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %20, double %21)
-  %23 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %22, %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
-  %24 = getelementptr inbounds %class.Box, %class.Box* %3, i32 0, i32 2
-  %25 = load double, double* %24, align 8
-  %26 = getelementptr inbounds %class.Box, %class.Box* %3, i32 0, i32 0
-  %27 = load double, double* %26, align 8
-  %28 = fmul double %25, %27
-  %29 = getelementptr inbounds %class.Box, %class.Box* %3, i32 0, i32 1
-  %30 = load double, double* %29, align 8
-  %31 = fmul double %28, %30
-  store double %31, double* %5, align 8
-  %32 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) @_ZSt4cout, i8* getelementptr inbounds ([18 x i8], [18 x i8]* @.str.1, i64 0, i64 0))
-  %33 = load double, double* %5, align 8
-  %34 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEd(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %32, double %33)
-  %35 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %34, %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
-  call void @_ZN3Box3setEddd(%class.Box* nonnull align 8 dereferenceable(24) %4, double 1.600000e+01, double 8.000000e+00, double 1.200000e+01)
-  %36 = call double @_ZN3Box3getEv(%class.Box* nonnull align 8 dereferenceable(24) %4)
-  store double %36, double* %5, align 8
-  %37 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) @_ZSt4cout, i8* getelementptr inbounds ([18 x i8], [18 x i8]* @.str.2, i64 0, i64 0))
-  %38 = load double, double* %5, align 8
-  %39 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEd(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %37, double %38)
-  %40 = call nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8) %39, %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
-  ret i32 0
+; Function Attrs: mustprogress noinline nounwind optnone uwtable
+define linkonce_odr dso_local void @_ZN6Square3setEd(%class.Square* nonnull align 8 dereferenceable(16) %0, double %1) #6 comdat align 2 {
+  %3 = alloca %class.Square*, align 8
+  %4 = alloca double, align 8
+  store %class.Square* %0, %class.Square** %3, align 8
+  store double %1, double* %4, align 8
+  %5 = load %class.Square*, %class.Square** %3, align 8
+  %6 = load double, double* %4, align 8
+  %7 = getelementptr inbounds %class.Square, %class.Square* %5, i32 0, i32 1
+  store double %6, double* %7, align 8
+  ret void
+}
+
+; Function Attrs: mustprogress noinline nounwind optnone uwtable
+define linkonce_odr dso_local double @_ZN6Square7getAreaEv(%class.Square* nonnull align 8 dereferenceable(16) %0) unnamed_addr #6 comdat align 2 {
+  %2 = alloca %class.Square*, align 8
+  store %class.Square* %0, %class.Square** %2, align 8
+  %3 = load %class.Square*, %class.Square** %2, align 8
+  %4 = getelementptr inbounds %class.Square, %class.Square* %3, i32 0, i32 1
+  %5 = load double, double* %4, align 8
+  %6 = getelementptr inbounds %class.Square, %class.Square* %3, i32 0, i32 1
+  %7 = load double, double* %6, align 8
+  %8 = fmul double %5, %7
+  ret double %8
 }
 
 declare dso_local nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8), i8*) #1
@@ -147,6 +155,45 @@ declare dso_local nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"
 declare dso_local nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZNSolsEPFRSoS_E(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8), %"class.std::basic_ostream"* (%"class.std::basic_ostream"*)*) #1
 
 declare dso_local nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8)) #1
+
+; Function Attrs: noinline nounwind optnone uwtable
+define linkonce_odr dso_local void @_ZN9RectangleC2Ev(%class.Rectangle* nonnull align 8 dereferenceable(24) %0) unnamed_addr #5 comdat align 2 {
+  %2 = alloca %class.Rectangle*, align 8
+  store %class.Rectangle* %0, %class.Rectangle** %2, align 8
+  %3 = load %class.Rectangle*, %class.Rectangle** %2, align 8
+  %4 = bitcast %class.Rectangle* %3 to %class.Square*
+  call void @_ZN6SquareC2Ev(%class.Square* nonnull align 8 dereferenceable(16) %4) #3
+  %5 = bitcast %class.Rectangle* %3 to i32 (...)***
+  store i32 (...)** bitcast (i8** getelementptr inbounds ({ [3 x i8*] }, { [3 x i8*] }* @_ZTV9Rectangle, i32 0, inrange i32 0, i32 2) to i32 (...)**), i32 (...)*** %5, align 8
+  ret void
+}
+
+; Function Attrs: mustprogress noinline nounwind optnone uwtable
+define linkonce_odr dso_local void @_ZN9Rectangle9setLengthEd(%class.Rectangle* nonnull align 8 dereferenceable(24) %0, double %1) #6 comdat align 2 {
+  %3 = alloca %class.Rectangle*, align 8
+  %4 = alloca double, align 8
+  store %class.Rectangle* %0, %class.Rectangle** %3, align 8
+  store double %1, double* %4, align 8
+  %5 = load %class.Rectangle*, %class.Rectangle** %3, align 8
+  %6 = load double, double* %4, align 8
+  %7 = getelementptr inbounds %class.Rectangle, %class.Rectangle* %5, i32 0, i32 1
+  store double %6, double* %7, align 8
+  ret void
+}
+
+; Function Attrs: mustprogress noinline nounwind optnone uwtable
+define linkonce_odr dso_local double @_ZN9Rectangle7getAreaEv(%class.Rectangle* nonnull align 8 dereferenceable(24) %0) unnamed_addr #6 comdat align 2 {
+  %2 = alloca %class.Rectangle*, align 8
+  store %class.Rectangle* %0, %class.Rectangle** %2, align 8
+  %3 = load %class.Rectangle*, %class.Rectangle** %2, align 8
+  %4 = bitcast %class.Rectangle* %3 to %class.Square*
+  %5 = getelementptr inbounds %class.Square, %class.Square* %4, i32 0, i32 1
+  %6 = load double, double* %5, align 8
+  %7 = getelementptr inbounds %class.Rectangle, %class.Rectangle* %3, i32 0, i32 1
+  %8 = load double, double* %7, align 8
+  %9 = fmul double %6, %8
+  ret double %9
+}
 
 ; Function Attrs: noinline uwtable
 define internal void @_GLOBAL__sub_I_hello.cpp() #0 section ".text.startup" {
@@ -158,8 +205,9 @@ attributes #0 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width
 attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #2 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #3 = { nounwind }
-attributes #4 = { mustprogress noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #5 = { mustprogress noinline norecurse optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #4 = { mustprogress noinline norecurse optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #5 = { noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #6 = { mustprogress noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 
 !llvm.module.flags = !{!0, !1, !2}
 !llvm.ident = !{!3}
