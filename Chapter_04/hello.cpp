@@ -10,6 +10,7 @@ class Square
       virtual double getArea(void) {
           return width * width;
       }
+
       void set( double dimen) {
          width = dimen;
       }  
@@ -21,6 +22,7 @@ class Rectangle:public Square {
       double getArea(void) {
          return width * length;
       }
+
       void setLength(double len) {
          length = len;
       }
@@ -44,6 +46,7 @@ int main( )
    rec.setLength(4.0);
    Rectangle *recPtr = &rec;
    double area = recPtr->getArea();
+   int level = recPtr->getLevel();
    cout << "rec area " << area <<endl;
    return 0;
 }

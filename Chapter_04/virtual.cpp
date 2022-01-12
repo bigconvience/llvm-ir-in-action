@@ -47,8 +47,18 @@ void setMemberValue(StructType *type, Value *value, int index, std::string name,
 }
 
 
+PointerType* createVtable() {
+  // function type: int (*f)(...) => i32 (...)
+  FunctionType *funcType = FunctionType::get(Builder->getInt32Ty(), {}, true);
+  PointerType* vtable = PointerType::get(funcType, 0);
+  return PointerType::get(vtable, 0);
+}
+
 int main(int argc, char *argv[]) {
   InitializeModule();
+
+  PointerType* vtable = createVtable();
+
 
   // create Box class struct
   StructType *Box = StructType::create(*TheContext, "class.Box");
@@ -62,6 +72,8 @@ int main(int argc, char *argv[]) {
 
   BasicBlock *entry = BasicBlock::Create(*TheContext, "entry", Box3getEv);
   Builder->SetInsertPoint(entry);
+
+  Value *fooBar = Builder->CreateAlloca(vtable, nullptr, "vtable");
 
   Function::arg_iterator getAI = Box3getEv->arg_begin();
   Value *getThis = getAI;
@@ -94,8 +106,6 @@ int main(int argc, char *argv[]) {
   Value *breVal = Builder->CreateLoad(memberType, setAI++, "breVal");
   Value *heiVal = Builder->CreateLoad(memberType, setAI++, "heiVal");
   setMemberValue(Box, setThis, 0, "length", lenVal);
-  setMemberValue(Box, setThis, 1, "breadth", breVal);
-  setMemberValue(Box, setThis, 2, "height", heiVal);
   verifyFunction(*Box3setEddd);
 
   TheModule->print(errs(), nullptr);
