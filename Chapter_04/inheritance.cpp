@@ -10,23 +10,32 @@ private:
     double _a;
 };
 
-class Square: public Box
+class Square
 {
 public:
-    void SetB(int value)
-    {
-        SetA(value);
+    void SetB(double value) {
         _b = value;
     }
 
-protected:
-    int _b;
+private:
+    double _b;
+};
+
+class Cube:public Box, public Square {
+public:
+    void SetC(double value) {
+        SetA(value);
+        SetB(value);
+        _c = value;
+    }
+private:
+    int _c;
 };
 
 int main( )
 {
 
-    Square square;
-    square.SetB(3);
+    Cube cube;
+    cube.SetC(3);
     return 0;
 }
