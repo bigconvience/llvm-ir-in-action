@@ -54,37 +54,58 @@ PointerType* createVtable() {
   return PointerType::get(vtable, 0);
 }
 
+StructType *createSquareTy(PointerType *vtable) {
+  StructType *SquareTy = StructType::create(*TheContext, "class.Square");
+  SquareTy->setBody({vtable, Builder->getDoubleTy()});
+  // getArea
+  Function *getArea = createFunc(Builder->getDoubleTy(), {PointerType::get(SquareTy, 0)}, "Square1getArea");
+  std::vector<std::string> FuncArgs;
+  FuncArgs.push_back("this");
+  setFuncArgs(getArea, FuncArgs);
+  BasicBlock *entry = BasicBlock::Create(*TheContext, "entry", getArea);
+  Builder->SetInsertPoint(entry);
+  Function::arg_iterator getAI = getArea->arg_begin();
+  Value *getThis = getAI;
+  Value *width = getMemberValue(SquareTy, getThis, 1, "width");
+  Value *getRet = Builder->CreateMul(width, width);
+  Builder->CreateRet(getRet);
+  verifyFunction(*getArea);
+
+  // set(double)
+  Function *set = createFunc(Builder->getVoidTy(), {PointerType::get(SquareTy, 0), Builder->getDoubleTy()}, "Square1set");
+  std::vector<std::string> SetFuncArgs;
+  SetFuncArgs.push_back("this");
+  SetFuncArgs.push_back("dimen");
+  setFuncArgs(set, SetFuncArgs);
+  BasicBlock *setEntry = BasicBlock::Create(*TheContext, "entry", set);
+  Builder->SetInsertPoint(setEntry);
+  Function::arg_iterator setAI = set->arg_begin();
+  Value *setThis = setAI++;
+  Value *lenVal = Builder->CreateLoad(Builder->getDoubleTy(), setAI, "dimen_value");
+  setMemberValue(SquareTy, setThis, 1, "width", lenVal);
+  verifyFunction(*set);
+  return SquareTy;
+}
+
+StructType *createRectangleTy(StructType *SquareTy) {
+  StructType *Rectangle = StructType::create(*TheContext, "class.Rectangle");
+  Rectangle->setBody({SquareTy, Builder->getDoubleTy()});
+  return Rectangle;
+}
+
+
 int main(int argc, char *argv[]) {
   InitializeModule();
 
   PointerType* vtable = createVtable();
 
-
-  // create Box class struct
+  StructType *SquareTy = createSquareTy(vtable);
+  StructType *RectangleTy = createRectangleTy(SquareTy);
+  
   StructType *Box = StructType::create(*TheContext, "class.Box");
   Box->setBody({Builder->getDoubleTy(), Builder->getDoubleTy(), Builder->getDoubleTy()});
 
-  // create double Box::get(void)
-  Function *Box3getEv = createFunc(Builder->getDoubleTy(), { PointerType::get(Box, 0) }, "Box3getEv");
-  std::vector<std::string> BoxGetFuncArgs;
-  BoxGetFuncArgs.push_back("this");
-  setFuncArgs(Box3getEv, BoxGetFuncArgs);
 
-  BasicBlock *entry = BasicBlock::Create(*TheContext, "entry", Box3getEv);
-  Builder->SetInsertPoint(entry);
-
-  Value *fooBar = Builder->CreateAlloca(vtable, nullptr, "vtable");
-
-  Function::arg_iterator getAI = Box3getEv->arg_begin();
-  Value *getThis = getAI;
-
-  Value *member_length = getMemberValue(Box, getThis, 0, "length");
-  Value *member_breadth = getMemberValue(Box, getThis, 1, "breadth");
-  Value *member_height = getMemberValue(Box, getThis, 2, "height");
-  Value *temp = Builder->CreateMul(member_length, member_breadth);
-  Value *getRet = Builder->CreateMul(temp, member_height);
-  Builder->CreateRet(getRet);
-  verifyFunction(*Box3getEv);
 
   // void Box::set(double len, double bre, double hei)
   Type *memberType = Builder->getDoubleTy();

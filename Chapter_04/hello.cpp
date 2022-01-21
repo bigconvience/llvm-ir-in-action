@@ -7,7 +7,7 @@ class Square
 {
    public:
       double width;
-      virtual double getArea(void) {
+      virtual double getArea() {
           return width * width;
       }
 
@@ -19,7 +19,7 @@ class Square
 class Rectangle:public Square {
    public:
       double length;
-      double getArea(void) {
+      double getArea() {
          return width * length;
       }
 
@@ -35,18 +35,11 @@ class Rectangle:public Square {
  * */
 int main( )
 {
-   Square Square1;        // 声明 Square1，类型为 Square
-   Square1.set(5.0);
- 
-   double volume = Square1.getArea();
-   cout << "Square1 volumn " << volume <<endl;
-
    Rectangle rec;
-   rec.set(3.0);
-   rec.setLength(4.0);
    Rectangle *recPtr = &rec;
+   recPtr->set(3.0);
+   recPtr->setLength(4.0);
    double area = recPtr->getArea();
-   int level = recPtr->getLevel();
    cout << "rec area " << area <<endl;
    return 0;
 }
