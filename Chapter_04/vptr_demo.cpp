@@ -28,11 +28,11 @@ class Rectangle:public Square {
       }
 };
 
+double increaseArea(Square *ps) {
+   return ps->getArea() + 1;
+}
 
-/**
- * https://www.geeksforgeeks.org/virtual-function-cpp
- * 
- * */
+
 int main( )
 {
    Rectangle rec;

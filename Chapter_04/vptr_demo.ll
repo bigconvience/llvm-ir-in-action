@@ -1,5 +1,5 @@
-; ModuleID = 'hello.cpp'
-source_filename = "hello.cpp"
+; ModuleID = 'vptr_demo.cpp'
+source_filename = "vptr_demo.cpp"
 target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
@@ -19,8 +19,8 @@ target triple = "x86_64-pc-linux-gnu"
 %struct.__locale_data = type opaque
 %"class.std::num_put" = type { %"class.std::locale::facet.base", [4 x i8] }
 %"class.std::num_get" = type { %"class.std::locale::facet.base", [4 x i8] }
-%class.Rectangle = type { %class.Square, double }
 %class.Square = type { i32 (...)**, double }
+%class.Rectangle = type { %class.Square, double }
 
 $_ZN9RectangleC2Ev = comdat any
 
@@ -58,7 +58,7 @@ $_ZTV6Square = comdat any
 @_ZTI6Square = linkonce_odr dso_local constant { i8*, i8* } { i8* bitcast (i8** getelementptr inbounds (i8*, i8** @_ZTVN10__cxxabiv117__class_type_infoE, i64 2) to i8*), i8* getelementptr inbounds ([8 x i8], [8 x i8]* @_ZTS6Square, i32 0, i32 0) }, comdat, align 8
 @_ZTI9Rectangle = linkonce_odr dso_local constant { i8*, i8*, i8* } { i8* bitcast (i8** getelementptr inbounds (i8*, i8** @_ZTVN10__cxxabiv120__si_class_type_infoE, i64 2) to i8*), i8* getelementptr inbounds ([11 x i8], [11 x i8]* @_ZTS9Rectangle, i32 0, i32 0), i8* bitcast ({ i8*, i8* }* @_ZTI6Square to i8*) }, comdat, align 8
 @_ZTV6Square = linkonce_odr dso_local unnamed_addr constant { [3 x i8*] } { [3 x i8*] [i8* null, i8* bitcast ({ i8*, i8* }* @_ZTI6Square to i8*), i8* bitcast (double (%class.Square*)* @_ZN6Square7getAreaEv to i8*)] }, comdat, align 8
-@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_hello.cpp, i8* null }]
+@llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_vptr_demo.cpp, i8* null }]
 
 ; Function Attrs: noinline uwtable
 define internal void @__cxx_global_var_init() #0 section ".text.startup" {
@@ -75,8 +75,22 @@ declare dso_local void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"* no
 ; Function Attrs: nounwind
 declare dso_local i32 @__cxa_atexit(void (i8*)*, i8*, i8*) #3
 
+; Function Attrs: mustprogress noinline optnone uwtable
+define dso_local double @_Z12increaseAreaP6Square(%class.Square* %0) #4 {
+  %2 = alloca %class.Square*, align 8
+  store %class.Square* %0, %class.Square** %2, align 8
+  %3 = load %class.Square*, %class.Square** %2, align 8
+  %4 = bitcast %class.Square* %3 to double (%class.Square*)***
+  %5 = load double (%class.Square*)**, double (%class.Square*)*** %4, align 8
+  %6 = getelementptr inbounds double (%class.Square*)*, double (%class.Square*)** %5, i64 0
+  %7 = load double (%class.Square*)*, double (%class.Square*)** %6, align 8
+  %8 = call double %7(%class.Square* nonnull align 8 dereferenceable(16) %3)
+  %9 = fadd double %8, 1.000000e+00
+  ret double %9
+}
+
 ; Function Attrs: mustprogress noinline norecurse optnone uwtable
-define dso_local i32 @main() #4 {
+define dso_local i32 @main() #5 {
   %1 = alloca i32, align 4
   %2 = alloca %class.Rectangle, align 8
   %3 = alloca %class.Rectangle*, align 8
@@ -104,7 +118,7 @@ define dso_local i32 @main() #4 {
 }
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define linkonce_odr dso_local void @_ZN9RectangleC2Ev(%class.Rectangle* nonnull align 8 dereferenceable(24) %0) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZN9RectangleC2Ev(%class.Rectangle* nonnull align 8 dereferenceable(24) %0) unnamed_addr #6 comdat align 2 {
   %2 = alloca %class.Rectangle*, align 8
   store %class.Rectangle* %0, %class.Rectangle** %2, align 8
   %3 = load %class.Rectangle*, %class.Rectangle** %2, align 8
@@ -116,7 +130,7 @@ define linkonce_odr dso_local void @_ZN9RectangleC2Ev(%class.Rectangle* nonnull 
 }
 
 ; Function Attrs: mustprogress noinline nounwind optnone uwtable
-define linkonce_odr dso_local void @_ZN6Square3setEd(%class.Square* nonnull align 8 dereferenceable(16) %0, double %1) #6 comdat align 2 {
+define linkonce_odr dso_local void @_ZN6Square3setEd(%class.Square* nonnull align 8 dereferenceable(16) %0, double %1) #7 comdat align 2 {
   %3 = alloca %class.Square*, align 8
   %4 = alloca double, align 8
   store %class.Square* %0, %class.Square** %3, align 8
@@ -129,7 +143,7 @@ define linkonce_odr dso_local void @_ZN6Square3setEd(%class.Square* nonnull alig
 }
 
 ; Function Attrs: mustprogress noinline nounwind optnone uwtable
-define linkonce_odr dso_local void @_ZN9Rectangle9setLengthEd(%class.Rectangle* nonnull align 8 dereferenceable(24) %0, double %1) #6 comdat align 2 {
+define linkonce_odr dso_local void @_ZN9Rectangle9setLengthEd(%class.Rectangle* nonnull align 8 dereferenceable(24) %0, double %1) #7 comdat align 2 {
   %3 = alloca %class.Rectangle*, align 8
   %4 = alloca double, align 8
   store %class.Rectangle* %0, %class.Rectangle** %3, align 8
@@ -150,7 +164,7 @@ declare dso_local nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"
 declare dso_local nonnull align 8 dereferenceable(8) %"class.std::basic_ostream"* @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(%"class.std::basic_ostream"* nonnull align 8 dereferenceable(8)) #1
 
 ; Function Attrs: noinline nounwind optnone uwtable
-define linkonce_odr dso_local void @_ZN6SquareC2Ev(%class.Square* nonnull align 8 dereferenceable(16) %0) unnamed_addr #5 comdat align 2 {
+define linkonce_odr dso_local void @_ZN6SquareC2Ev(%class.Square* nonnull align 8 dereferenceable(16) %0) unnamed_addr #6 comdat align 2 {
   %2 = alloca %class.Square*, align 8
   store %class.Square* %0, %class.Square** %2, align 8
   %3 = load %class.Square*, %class.Square** %2, align 8
@@ -160,7 +174,7 @@ define linkonce_odr dso_local void @_ZN6SquareC2Ev(%class.Square* nonnull align 
 }
 
 ; Function Attrs: mustprogress noinline nounwind optnone uwtable
-define linkonce_odr dso_local double @_ZN9Rectangle7getAreaEv(%class.Rectangle* nonnull align 8 dereferenceable(24) %0) unnamed_addr #6 comdat align 2 {
+define linkonce_odr dso_local double @_ZN9Rectangle7getAreaEv(%class.Rectangle* nonnull align 8 dereferenceable(24) %0) unnamed_addr #7 comdat align 2 {
   %2 = alloca %class.Rectangle*, align 8
   store %class.Rectangle* %0, %class.Rectangle** %2, align 8
   %3 = load %class.Rectangle*, %class.Rectangle** %2, align 8
@@ -174,7 +188,7 @@ define linkonce_odr dso_local double @_ZN9Rectangle7getAreaEv(%class.Rectangle* 
 }
 
 ; Function Attrs: mustprogress noinline nounwind optnone uwtable
-define linkonce_odr dso_local double @_ZN6Square7getAreaEv(%class.Square* nonnull align 8 dereferenceable(16) %0) unnamed_addr #6 comdat align 2 {
+define linkonce_odr dso_local double @_ZN6Square7getAreaEv(%class.Square* nonnull align 8 dereferenceable(16) %0) unnamed_addr #7 comdat align 2 {
   %2 = alloca %class.Square*, align 8
   store %class.Square* %0, %class.Square** %2, align 8
   %3 = load %class.Square*, %class.Square** %2, align 8
@@ -187,7 +201,7 @@ define linkonce_odr dso_local double @_ZN6Square7getAreaEv(%class.Square* nonnul
 }
 
 ; Function Attrs: noinline uwtable
-define internal void @_GLOBAL__sub_I_hello.cpp() #0 section ".text.startup" {
+define internal void @_GLOBAL__sub_I_vptr_demo.cpp() #0 section ".text.startup" {
   call void @__cxx_global_var_init()
   ret void
 }
@@ -196,9 +210,10 @@ attributes #0 = { noinline uwtable "frame-pointer"="all" "min-legal-vector-width
 attributes #1 = { "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #2 = { nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #3 = { nounwind }
-attributes #4 = { mustprogress noinline norecurse optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #5 = { noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
-attributes #6 = { mustprogress noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #4 = { mustprogress noinline optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #5 = { mustprogress noinline norecurse optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #6 = { noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
+attributes #7 = { mustprogress noinline nounwind optnone uwtable "frame-pointer"="all" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 
 !llvm.module.flags = !{!0, !1, !2}
 !llvm.ident = !{!3}
