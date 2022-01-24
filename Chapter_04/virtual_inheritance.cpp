@@ -91,11 +91,12 @@ StructType *CreateBaseB(PointerType *vtable, StructType *BaseA) {
   Value *temp7 = Builder->CreateBitCast(tmp6, pi64Ty, "temp7");
   Value *temp8 = Builder->CreateLoad(i64Ty, temp7, "temp8");
   Value *temp9 = Builder->CreateBitCast(ptrBaseB, pi8Ty, "temp9");
-
-  
-
+  Value *temp10 = Builder->CreateGEP(i8Ty, temp9, temp8, "temp10");
+  Value *ptrBaseA = Builder->CreateBitCast(temp10, PointerType::get(BaseA, 0), "baseA");
+  Value *a = getMemberValue(BaseA, ptrBaseA, 0, "a");
   Value *c = getMemberValue(BaseB, ptrBaseB, 1, "c");
-
+  Value *ret = Builder->CreateAdd(a, c, "ret");
+  Builder->CreateRet(ret);
   return BaseB;
 }
 
