@@ -94,8 +94,8 @@ StructType *CreateBaseB(PointerType *vtable, StructType *BaseA) {
   Value *temp10 = Builder->CreateGEP(i8Ty, temp9, temp8, "temp10");
   Value *ptrBaseA = Builder->CreateBitCast(temp10, PointerType::get(BaseA, 0), "baseA");
   Value *a = getMemberValue(BaseA, ptrBaseA, 0, "a");
-  Value *c = getMemberValue(BaseB, ptrBaseB, 1, "c");
-  Value *ret = Builder->CreateAdd(a, c, "ret");
+  Value *b = getMemberValue(BaseB, ptrBaseB, 1, "b");
+  Value *ret = Builder->CreateAdd(a, b, "ret");
   Builder->CreateRet(ret);
   return BaseB;
 }
@@ -114,7 +114,28 @@ StructType *CreateBaseC(PointerType *vtable, StructType *BaseA) {
   Function::arg_iterator getAI = getArea->arg_begin();
   Value *getThis = getAI;
 
+  PointerType *pBaseC = PointerType::get(BaseC, 0);
+  Value *thisTmp = Builder->CreateAlloca(pBaseC);
+  Builder->CreateStore(getThis, thisTmp);
+  Value *ptrBaseC = Builder->CreateLoad(pBaseC, thisTmp, "ptrBaseC");
 
+  Type *i8Ty = Builder->getInt8Ty();
+  Type *i64Ty = Builder->getInt64Ty();
+  PointerType *pi8Ty = PointerType::get(i8Ty, 0);
+  PointerType *pi64Ty = PointerType::get(i64Ty, 0);
+  PointerType *ppi8Ty = PointerType::get(pi8Ty, 0);
+  Value *ppi8 = Builder->CreateBitCast(ptrBaseC, ppi8Ty);
+  Value *pi8Value = Builder->CreateLoad(pi8Ty, ppi8);
+  Value *tmp6 = Builder->CreateGEP(i8Ty, pi8Value, Builder->getInt64(-24), "tmp6");
+  Value *temp7 = Builder->CreateBitCast(tmp6, pi64Ty, "temp7");
+  Value *temp8 = Builder->CreateLoad(i64Ty, temp7, "temp8");
+  Value *temp9 = Builder->CreateBitCast(ptrBaseC, pi8Ty, "temp9");
+  Value *temp10 = Builder->CreateGEP(i8Ty, temp9, temp8, "temp10");
+  Value *ptrBaseA = Builder->CreateBitCast(temp10, PointerType::get(BaseA, 0), "baseA");
+  Value *a = getMemberValue(BaseA, ptrBaseA, 0, "a");
+  Value *c = getMemberValue(BaseC, ptrBaseC, 1, "c");
+  Value *ret = Builder->CreateAdd(a, c, "ret");
+  Builder->CreateRet(ret);
   return BaseC;
 }
 
