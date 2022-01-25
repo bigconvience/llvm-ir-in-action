@@ -34,7 +34,9 @@ public:
    } 
 };
 
-int sum(Derived *derived) {
-   return derived->sumDer();
+int exeSum() {
+    Derived derived;
+    derived.d = 10;
+   return derived.sumDer();
 }
 

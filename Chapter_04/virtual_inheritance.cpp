@@ -139,12 +139,57 @@ StructType *CreateBaseC(PointerType *vtable, StructType *BaseA) {
   return BaseC;
 }
 
+StructType *CreateBaseDerived(PointerType *vtable, StructType *BaseA, StructType *BaseB, StructType *BaseC) {
+  StructType *BaseBBase = StructType::create(*TheContext, "class.BaseB.Base");
+  BaseBBase->setBody({vtable, Builder->getInt32Ty()}, true);
+  StructType *BaseCBase = StructType::create(*TheContext, "class.BaseC.Base");
+  BaseCBase->setBody({vtable, Builder->getInt32Ty()}, true);
+  StructType *Derived = StructType::create(*TheContext, "class.Derived");
+  
+  Type *i8Ty = Builder->getInt8Ty();
+  ArrayType *array = ArrayType::get(i8Ty, 4);
+  Derived->setBody({BaseBBase, array, BaseCBase, BaseA, array});
+
+  Function *getArea = createFunc(Builder->getInt32Ty(), {PointerType::get(Derived, 0)}, "Derived6sumDerEv");
+  std::vector<std::string> FuncArgs;
+  FuncArgs.push_back("this");
+  setFuncArgs(getArea, FuncArgs);
+  BasicBlock *entry = BasicBlock::Create(*TheContext, "entry", getArea);
+  Builder->SetInsertPoint(entry);
+  Function::arg_iterator getAI = getArea->arg_begin();
+  Value *getThis = getAI;
+
+  PointerType *pDerived = PointerType::get(Derived, 0);
+  Value *thisTmp = Builder->CreateAlloca(pDerived);
+  Builder->CreateStore(getThis, thisTmp);
+  Value *ptrDerived = Builder->CreateLoad(pDerived, thisTmp, "ptrDerived");
+  Value *baseB = Builder->CreateBitCast(ptrDerived, PointerType::get(BaseB, 0), "baseB");
+  Function *BaseB4sumBEv = TheModule->getFunction("BaseB4sumBEv");
+  Value *sumB = Builder->CreateCall(BaseB4sumBEv, {baseB}, "sumB");
+
+
+  PointerType *pi8Ty = PointerType::get(i8Ty, 0);
+  Value *ptrI8 = Builder->CreateBitCast(ptrDerived, pi8Ty, "ptrI8");
+  Value *tmp7 = Builder->CreateGEP(i8Ty, ptrI8, Builder->getInt64(16), "temp7");
+  Value *baseC = Builder->CreateBitCast(tmp7, PointerType::get(BaseC, 0), "baseC");
+  Function *BaseC4sumCEv = TheModule->getFunction("BaseC4sumCEv");
+  Value *sumC = Builder->CreateCall(BaseC4sumCEv, {baseC}, "sumC");
+  Value *sum1 = Builder->CreateAdd(sumB, sumC, "sum1");
+  Value *ptrd = Builder->CreateGEP(Derived, ptrDerived, {Builder->getInt32(0), Builder->getInt32(3)}, "ptrd");
+  Value *d = Builder->CreateLoad(Builder->getInt32Ty(), ptrd, "d");
+  Value *ret = Builder->CreateAdd(sum1, d);
+  Builder->CreateRet(ret);
+
+  return Derived;
+}
+
 int main(int argc, char *argv[]) {
   InitializeModule();
   PointerType* vtable = createVtable();
   StructType *BaseA = CreateBaseA();
   StructType *BaseB = CreateBaseB(vtable, BaseA);
   StructType *BaseC = CreateBaseC(vtable, BaseA);
+  CreateBaseDerived(vtable, BaseA, BaseB, BaseC);
 
   TheModule->print(errs(), nullptr);
   return 0;
