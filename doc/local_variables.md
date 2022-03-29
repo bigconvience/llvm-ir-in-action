@@ -50,8 +50,8 @@ clang++ local_variable.cpp `llvm-config --cxxflags --ldflags --system-libs --lib
 ```
 输出：
 ```
-; ModuleID = 'first modlue'
-source_filename = "first modlue"
+; ModuleID = 'first module'
+source_filename = "first module"
 
 define i32 @Foo(i32 %a, i32 %b) {
 entry:
@@ -85,8 +85,8 @@ clang++ local_variable.cpp `llvm-config --cxxflags --ldflags --system-libs --lib
 ```
 输出：
 ```
-; ModuleID = 'first modlue'
-source_filename = "first modlue"
+; ModuleID = 'first module'
+source_filename = "first module"
 
 define i32 @Foo(i32 %a, i32 %b) {
 entry:
@@ -118,7 +118,7 @@ static std::unique_ptr<IRBuilder<>> Builder;
 
 static void InitializeModule() {
   TheContext = std::make_unique<LLVMContext>();
-  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  TheModule = std::make_unique<Module>("first module", *TheContext);
   // Create a new builder for the module.
   Builder = std::make_unique<IRBuilder<>>(*TheContext);
 }

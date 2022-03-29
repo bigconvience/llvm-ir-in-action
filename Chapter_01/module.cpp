@@ -8,7 +8,7 @@ static std::unique_ptr<Module> TheModule;
 
 static void InitializeModule() {
   TheContext = std::make_unique<LLVMContext>();
-  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  TheModule = std::make_unique<Module>("first module", *TheContext);
 }
 
 int main(int argc, char *argv[]) {

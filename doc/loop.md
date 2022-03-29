@@ -127,8 +127,8 @@ clang++ loop.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -f
 ```
 输出：
 ```
-; ModuleID = 'first modlue'
-source_filename = "first modlue"
+; ModuleID = 'first module'
+source_filename = "first module"
 
 define i32 @sum(i32 %a, i32 %b) {
 entry:
@@ -176,7 +176,7 @@ static std::unique_ptr<IRBuilder<>> Builder;
 
 static void InitializeModule() {
   TheContext = std::make_unique<LLVMContext>();
-  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  TheModule = std::make_unique<Module>("first module", *TheContext);
   Builder = std::make_unique<IRBuilder<>>(*TheContext);
 }
 

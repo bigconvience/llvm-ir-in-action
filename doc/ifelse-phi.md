@@ -105,8 +105,8 @@ clang++ ifelse_phi.cpp `llvm-config --cxxflags --ldflags --system-libs --libs co
 ```
 输出：
 ```
-; ModuleID = 'first modlue'
-source_filename = "first modlue"
+; ModuleID = 'first module'
+source_filename = "first module"
 
 define i32 @max(i32 %a, i32 %b) {
 entry:
@@ -147,7 +147,7 @@ static std::unique_ptr<IRBuilder<>> Builder;
 
 static void InitializeModule() {
   TheContext = std::make_unique<LLVMContext>();
-  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  TheModule = std::make_unique<Module>("first module", *TheContext);
   Builder = std::make_unique<IRBuilder<>>(*TheContext);
 }
 

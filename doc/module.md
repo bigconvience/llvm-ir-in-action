@@ -80,7 +80,7 @@ static std::unique_ptr<Module> TheModule;
 
 static void InitializeModule() {
   TheContext = std::make_unique<LLVMContext>();
-  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  TheModule = std::make_unique<Module>("first module", *TheContext);
 }
 ```
 ### 打印Module
@@ -100,8 +100,8 @@ clang++ module.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` 
 ```
 输出：
 ```
-; ModuleID = 'first modlue'
-source_filename = "first modlue"
+; ModuleID = 'first module'
+source_filename = "first module"
 ```
 
 ## 总结
@@ -121,7 +121,7 @@ static std::unique_ptr<Module> TheModule;
 
 static void InitializeModule() {
   TheContext = std::make_unique<LLVMContext>();
-  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  TheModule = std::make_unique<Module>("first module", *TheContext);
 }
 
 int main(int argc, char *argv[]) {
