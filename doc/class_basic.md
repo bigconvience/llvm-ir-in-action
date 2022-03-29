@@ -174,7 +174,7 @@ clang++ class.cpp `llvm-config --cxxflags --ldflags --system-libs --libs core` -
 ```
 输出：
 ```
-source_filename = "first modlue"
+source_filename = "first module"
 
 %class.Box = type { double, double, double }
 
@@ -223,7 +223,7 @@ static std::unique_ptr<IRBuilder<>> Builder;
 
 static void InitializeModule() {
   TheContext = std::make_unique<LLVMContext>();
-  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  TheModule = std::make_unique<Module>("first module", *TheContext);
   // Create a new builder for the module.
   Builder = std::make_unique<IRBuilder<>>(*TheContext);
 }

@@ -270,8 +270,8 @@ clang++ virtual_inheritance.cpp `llvm-config --cxxflags --ldflags --system-libs 
 ```
 输出：
 ```
-; ModuleID = 'first modlue'
-source_filename = "first modlue"
+; ModuleID = 'first module'
+source_filename = "first module"
 
 %class.BaseB = type <{ i32 (...)**, i32, %class.BaseA }>
 %class.BaseA = type { i32 }
@@ -357,7 +357,7 @@ static std::unique_ptr<IRBuilder<>> Builder;
 
 static void InitializeModule() {
   TheContext = std::make_unique<LLVMContext>();
-  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  TheModule = std::make_unique<Module>("first module", *TheContext);
   // Create a new builder for the module.
   Builder = std::make_unique<IRBuilder<>>(*TheContext);
 }

@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
 ```
 生成的IR如下：
 ```
-; ModuleID = 'first modlue'
-source_filename = "first modlue"
+; ModuleID = 'first module'
+source_filename = "first module"
 
 @variable = constant i32 21
 ```
@@ -70,8 +70,8 @@ clang++ constants.cpp `llvm-config --cxxflags --ldflags --system-libs --libs cor
 ```
 输出：
 ```
-; ModuleID = 'first modlue'
-source_filename = "first modlue"
+; ModuleID = 'first module'
+source_filename = "first module"
 
 %Foo = type { i32, double }
 
@@ -101,7 +101,7 @@ static std::unique_ptr<IRBuilder<>> Builder;
 
 static void InitializeModule() {
   TheContext = std::make_unique<LLVMContext>();
-  TheModule = std::make_unique<Module>("first modlue", *TheContext);
+  TheModule = std::make_unique<Module>("first module", *TheContext);
   // Create a new builder for the module.
   Builder = std::make_unique<IRBuilder<>>(*TheContext);
 }
